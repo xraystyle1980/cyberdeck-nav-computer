@@ -1,5 +1,6 @@
 import shutil
 import sys
+import counter_link
 import route_store
 from spansh_client import lookup_system, plot_neutron_route
 
@@ -113,8 +114,15 @@ def neutron_route():
     route_view(route, "ROUTE PLOTTED AND SAVED")
 
 def route_view(route, message=None):
-    """Show a route around your current waypoint and track progress along it."""
+    """Show a route and track progress; the counter shows jumps remaining meanwhile."""
+    try:
+        _route_view(route, message)
+    finally:
+        counter_link.clear()
+
+def _route_view(route, message):
     while True:
+        counter_link.show_jumps(route_store.jumps_remaining(route))
         waypoints = route["waypoints"]
         pos, last = route["position"], len(waypoints) - 1
         done = route["status"] == "completed"

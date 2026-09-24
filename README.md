@@ -9,9 +9,10 @@ with a TM1637 7-segment counter on the GPIO header.
   with suggestions for partial names. Every plotted route is named and saved to
   `~/.local/share/nav-computer/routes/` and tracks your current waypoint,
   so you can resume it after a reboot and mark it complete when you arrive.
-- **Counter display**: shows the Pi's CPU temperature (`43:6°` = 43.6 °C;
-  the module's decimal points aren't wired, so the colon stands in) or the
-  live download rate.
+- **Counter display**: shows jumps remaining (`0097`) while a route is open
+  in the nav computer, otherwise the Pi's CPU temperature (`43:6°` = 43.6 °C;
+  the module's decimal points aren't wired, so the colon stands in). The live
+  download rate is available as an alternative readout.
 
 ## Hardware
 
@@ -39,10 +40,10 @@ Run it: `venv/bin/python nav_computer.py`
 Paths in these files assume the user `lonestarr` and `~/navcomputer`.
 
 ```bash
-# Counter display at boot (temperature; live-rate is the alternative)
+# Counter display at boot (route jumps / temperature; live-rate is the alternative)
 cp system/systemd-user/*.service ~/.config/systemd/user/
 systemctl --user daemon-reload
-systemctl --user enable --now temp-display
+systemctl --user enable --now counter-display
 sudo loginctl enable-linger "$USER"   # start user services at boot
 
 # Nav Computer launcher: app menu, desktop and taskbar
@@ -58,8 +59,8 @@ cp system/labwc/rc.xml ~/.config/labwc/rc.xml
 Switch the counter between readouts (each stops the other):
 
 ```bash
-systemctl --user start live-rate      # download rate: KB/s, colon lit = MB/s
-systemctl --user start temp-display   # CPU temperature
+systemctl --user start live-rate         # download rate: KB/s, colon lit = MB/s
+systemctl --user start counter-display   # route jumps / CPU temperature
 ```
 
 ### Keyboard cold-boot fix
