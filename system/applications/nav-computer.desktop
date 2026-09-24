@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Nav Computer
+Comment=FSD navigation interface
+Exec=lxterminal --title="Nav Computer" --working-directory=/home/lonestarr/navcomputer --command="/home/lonestarr/navcomputer/venv/bin/python nav_computer.py"
+Icon=starred
+Terminal=false
+Categories=Utility;

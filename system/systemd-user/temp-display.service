@@ -1,0 +1,12 @@
+[Unit]
+Description=Pi CPU temperature on the TM1637 counter display
+Conflicts=live-rate.service
+
+[Service]
+WorkingDirectory=%h/navcomputer
+ExecStart=%h/navcomputer/venv/bin/python -u temp_display.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

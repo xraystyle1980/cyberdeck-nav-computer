@@ -1,0 +1,13 @@
+[Unit]
+Description=Power-cycle USB ports at boot so the Corne keyboard starts with the host ready
+# Must finish before the desktop starts: cutting USB power also blanks the
+# USB-powered screen, and labwc crashes if its only display disappears.
+After=systemd-udevd.service
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/usb-power-cycle.sh
+
+[Install]
+WantedBy=multi-user.target
