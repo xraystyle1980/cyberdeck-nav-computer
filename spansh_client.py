@@ -46,10 +46,24 @@ def plot_neutron_route(source, destination, jump_range, efficiency=60):
         if result_data.get("status") == "queued":
             continue
 
-        jumps = result_data.get("result", {}).get("system_jumps", [])
-        return [
-            {"system": j["system"], "neutron_star": j.get("neutron_star", False)}
-            for j in jumps
-        ]
+        result = result_data.get("result", {})
+        return {
+            "source": result.get("source_system", source),
+            "destination": result.get("destination_system", destination),
+            "range": float(result.get("range", jump_range)),
+            "efficiency": int(result.get("efficiency", efficiency)),
+            "distance": result.get("distance", 0),
+            "job": job_id,
+            "waypoints": [
+                {
+                    "system": j["system"],
+                    "id64": j.get("id64"),
+                    "jumps": j.get("jumps", 0),
+                    "neutron_star": j.get("neutron_star", False),
+                    "distance_left": j.get("distance_left", 0),
+                }
+                for j in result.get("system_jumps", [])
+            ],
+        }
 
     raise TimeoutError("Spansh route job did not complete in time")
