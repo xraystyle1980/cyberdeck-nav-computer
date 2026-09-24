@@ -6,7 +6,9 @@ with a TM1637 7-segment counter on the GPIO header.
 - **Nav computer** (`nav_computer.py`): full-screen terminal UI that plots
   neutron-star routes through the [Spansh](https://spansh.co.uk) API.
   Start and destination names are checked against Spansh's system list,
-  with suggestions for partial names.
+  with suggestions for partial names. Every plotted route is saved to
+  `~/.local/share/nav-computer/routes/` and tracks your current waypoint,
+  so you can resume it after a reboot and mark it complete when you arrive.
 - **Counter display**: shows the Pi's CPU temperature (`43:6°` = 43.6 °C;
   the module's decimal points aren't wired, so the colon stands in) or the
   live download rate.
