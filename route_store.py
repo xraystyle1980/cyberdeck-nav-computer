@@ -22,11 +22,26 @@ def save(route):
     os.replace(tmp, path)
 
 
-def create(plot):
+def default_name(route):
+    return f"{route['source']} -> {route['destination']}"
+
+
+def name(route):
+    # Routes saved before naming existed have no "name" key
+    return route.get("name") or default_name(route)
+
+
+def rename(route, new_name):
+    route["name"] = new_name.strip()[:40] or default_name(route)
+    save(route)
+
+
+def create(plot, route_name=None):
     """Save a freshly plotted route (from spansh_client) and return it."""
     now = datetime.now()
     route = dict(plot)
     route.update({
+        "name": (route_name or "").strip()[:40] or default_name(plot),
         "id": now.strftime("%Y%m%d-%H%M%S"),
         "created": now.strftime("%Y-%m-%d %H:%M"),
         "status": "active",

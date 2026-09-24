@@ -101,11 +101,15 @@ def neutron_route():
     last_start, last_range = start, jump_range
     print(BRIGHT + f"\n  [PLOTTING {start.upper()} -> {dest.upper()} @ {jump_range:g} LY...]" + RESET)
     try:
-        route = route_store.create(plot_neutron_route(start, dest, jump_range=jump_range))
+        plot = plot_neutron_route(start, dest, jump_range=jump_range)
     except Exception as e:
         print(BRIGHT + f"\n  [ERROR: {e}]\n" + RESET)
         input(GREEN + "\n  PRESS ENTER TO RETURN..." + RESET)
         return
+    default = route_store.default_name(plot)
+    print(BRIGHT + f"\n  ROUTE FOUND — {len(plot['waypoints'])} WAYPOINTS" + RESET)
+    route_name = input(GREEN + f"  ROUTE NAME [{default}] > " + RESET)
+    route = route_store.create(plot, route_name)
     route_view(route, "ROUTE PLOTTED AND SAVED")
 
 def route_view(route, message=None):
@@ -116,7 +120,9 @@ def route_view(route, message=None):
         done = route["status"] == "completed"
         clear()
         border()
-        line(f"{route['source']} -> {route['destination']}".upper())
+        line(route_store.name(route).upper())
+        if route_store.name(route) != route_store.default_name(route):
+            line(route_store.default_name(route).upper())
         line(f"{route['distance']:,.0f} LY | {len(waypoints)} WAYPOINTS | "
              f"{route_store.total_jumps(route)} JUMPS | {route['range']:g} LY RANGE")
         if done:
@@ -125,7 +131,7 @@ def route_view(route, message=None):
             line(f"AT WAYPOINT {pos}/{last} | {route_store.jumps_remaining(route)} JUMPS, "
                  f"{waypoints[pos]['distance_left']:,.0f} LY TO GO")
         border()
-        rows = max(5, shutil.get_terminal_size().lines - 12)
+        rows = max(5, shutil.get_terminal_size().lines - 14)
         first = max(0, min(pos - 2, len(waypoints) - rows))
         for i in range(first, min(first + rows, len(waypoints))):
             w = waypoints[i]
@@ -137,7 +143,8 @@ def route_view(route, message=None):
             print(BRIGHT + f"  {message}" + RESET)
             message = None
         toggle = "[R] REOPEN" if done else "[C] COMPLETE"
-        print(GREEN + f"  [N] NEXT  [P] PREV  [#] GO TO  {toggle}  [D] DELETE  [ENTER] BACK" + RESET)
+        print(GREEN + "  [N] NEXT  [P] PREV  [#] GO TO WAYPOINT" + RESET)
+        print(GREEN + f"  {toggle}  [E] NAME  [D] DELETE  [ENTER] BACK" + RESET)
         choice = input(GREEN + "  > " + RESET).strip().lower()
 
         if choice in ("", "b"):
@@ -157,6 +164,11 @@ def route_view(route, message=None):
         elif choice == "r" and done:
             route_store.reopen(route)
             message = "ROUTE REOPENED"
+        elif choice == "e":
+            new_name = input(GREEN + f"  NEW NAME [{route_store.name(route)}] > " + RESET)
+            if new_name.strip():
+                route_store.rename(route, new_name)
+                message = "ROUTE RENAMED"
         elif choice == "d":
             if input(GREEN + "  DELETE THIS ROUTE? Y/N > " + RESET).strip().lower() == "y":
                 route_store.delete(route)
@@ -177,8 +189,7 @@ def saved_routes():
         rows = max(5, shutil.get_terminal_size().lines - 8)
         for i, r in enumerate(routes[:rows], 1):
             progress = "DONE" if r["status"] == "completed" else f"{r['position']}/{len(r['waypoints']) - 1}"
-            line(f"[{i:>2}] {r['source'][:14]:<14} -> {r['destination'][:14]:<14} "
-                 f"{progress:>7} {r['created'][:10]}")
+            line(f"[{i:>2}] {route_store.name(r)[:32]:<32} {progress:>7} {r['created'][:10]}")
         if len(routes) > rows:
             line(f"(+{len(routes) - rows} OLDER NOT SHOWN)")
         border()
