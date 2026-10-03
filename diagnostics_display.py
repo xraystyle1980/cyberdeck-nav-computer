@@ -8,7 +8,7 @@ serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial, width=128, height=64)
 device.contrast(255)
 
-NAV_VERSION = "v0.2"
+NAV_VERSION = "v0.3"
 SPANSH_STATUS = "OK"  # placeholder — wire to real check later
 
 def get_cpu_temp():
@@ -27,9 +27,9 @@ try:
             draw.text((2, 2), "SYSTEM", fill="white")
 
             # Blue zone — live data
-            draw.text((2, 20), f"CPU Temp: {temp_str}", fill="white")
-            draw.text((2, 32), f"Nav Version: {NAV_VERSION}", fill="white")
-            draw.text((2, 44), f"Spansh API: {SPANSH_STATUS}", fill="white")
+            draw.text((2, 20), f"Spansh API: {SPANSH_STATUS}", fill="white")
+            draw.text((2, 32), f"CPU Temp: {temp_str}", fill="white")
+            draw.text((2, 44), f"FSD Nav Interface: {NAV_VERSION}", fill="white")
 
         time.sleep(2)  # refresh every 2 seconds
 
